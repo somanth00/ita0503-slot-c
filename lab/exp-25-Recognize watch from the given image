@@ -1,14 +1,39 @@
+
 import cv2
 
-watch = cv2.CascadeClassifier('watch_cascade.xml')
-image = cv2.imread('watch.jpg')
+# Load the pre-trained watch cascade
+watch_cascade = cv2.CascadeClassifier("watch_cascade.xml")
+
+# Check cascade file
+if watch_cascade.empty():
+    print("Error: watch_cascade.xml not found!")
+    exit()
+
+# Read input image
+image = cv2.imread("watch.jpg")
+
+if image is None:
+    print("Error: watch.jpg not found!")
+    exit()
+
+# Convert image to grayscale
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-objects = watch.detectMultiScale(gray, 1.1, 5)
+# Detect watches
+watches = watch_cascade.detectMultiScale(
+    gray,
+    scaleFactor=1.1,
+    minNeighbors=5,
+    minSize=(30, 30)
+)
 
-for (x, y, w, h) in objects:
-    cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
+# Draw rectangles
+for (x, y, w, h) in watches:
+    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-cv2.imshow('Watch Detection', image)
+# Display result
+print("Number of watches detected:", len(watches))
+
+cv2.imshow("Detected Watch", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
